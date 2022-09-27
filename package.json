@@ -13,10 +13,13 @@
     "dependencies": {
         "@expo/vector-icons": "^13.0.0",
         "@react-native-community/slider": "^4.3.1",
+        "@react-native-picker/picker": "^2.4.4",
         "deprecated-react-native-prop-types": "^2.3.0",
         "lodash": "^4.17.21",
         "react": "18.1.0",
         "react-native": "0.70.1",
+        "react-native-gesture-handler": "^2.6.2",
+        "react-native-media-controls": "^2.3.0",
         "react-native-orientation-locker": "^1.5.0",
         "react-native-paper": "5.0.0-rc.5",
         "react-native-system-setting": "^1.7.6",

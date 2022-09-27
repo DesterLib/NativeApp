@@ -1,97 +1,60 @@
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
+import { Dimensions } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { LANDSCAPE, OrientationLocker, PORTRAIT } from 'react-native-orientation-locker';
+import { Button, Text } from 'react-native-paper';
 import Video from 'react-native-video';
 
-import { handleMuteUnmute, handlePlayPause, onLoad, onProgress } from './events';
-import PlayerControls from './playercontrols';
+import Controls from './controls';
+import { onLoad, onProgress } from './controls/events';
 
-const VideoPlayer = () => {
+const windowHeight = Dimensions.get('screen').height;
+
+const VideoPlayer = (props: any) => {
+    const { url } = props;
     const videoRef = React.useRef<any>(null);
-    let seekerWidth = 0;
-    const [state, setState] = useState<any>({
-        fullscreen: false,
-        currentTime: 0,
-        duration: 0,
-        muted: false,
-        showControls: true,
-        seeking: false,
-        rate: 1,
-        volume: 1,
-        resizeMode: 'contain',
-        videoWidth: 0,
-        videoHeight: 0,
+    const [player, setPlayer] = React.useState({
         paused: false,
-        decoration: true,
-        isLoading: false,
-        stable: false,
-        seekerFillWidth: 0,
-        seekerPosition: 0,
-        seekerOffset: 0,
-        audioTracks: [],
-        textTracks: [],
-        selectedAudioTrack: undefined,
-        selectedTextTrack: undefined,
-        srcListId: 0,
-        loop: false,
+        muted: false,
+        seeking: false,
+        duration: 0,
+        currentTime: 0,
+        fullscreen: false,
     });
-
-    const onForceSeek = (seek: any) => {
-        //Handler for change in seekbar
-        videoRef.current.seek(seek);
-    };
-
-    const onSeeking = (currentTime: any) => setState({ ...state, currentTime });
-
+    const [showVideo, setShowVideo] = React.useState(true);
     return (
-        <View
-            style={styles.container}
-            onLayout={(event) => (seekerWidth = event.nativeEvent.layout.width)}
-        >
-            <Video
-                ref={videoRef}
-                style={styles.video}
-                controls={false}
-                paused={!state.paused}
-                muted={state.muted}
-                // onProgress={() =>
-                //   onProgress({ data: videoRef.current, state, setState })
-                // }
-                onLoad={(data) => onLoad({ data, setState })}
-                onProgress={(data) => onProgress({ data, setState })}
-                resizeMode={'contain'}
-                source={{
-                    uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        <View>
+            <View
+                style={{
+                    flex: 1,
+                    width: '100%',
+                    position: 'relative',
+                    // aspectRatio: 16 / 9,
                 }}
-            />
-            <PlayerControls
-                state={state}
-                setState={setState}
-                playing={state.paused}
-                muted={state.muted}
-                currentTime={state.currentTime}
-                duration={state.duration}
-                onSlidingStart={() => setState({ ...state, seeking: true })}
-                onSlidingComplete={(data: number) => {
-                    videoRef.current.seek(data);
-                    setState({ ...state, seeking: false, currentTime: data });
-                }}
-                onForceSeek={onForceSeek}
-                onPlay={() => handlePlayPause({ state, setState })}
-                onPause={() => handlePlayPause({ state, setState })}
-                onMute={() => handleMuteUnmute({ state, setState })}
-                onUnmute={() => handleMuteUnmute({ state, setState })}
-            />
+            >
+                {/* <OrientationLocker orientation={LANDSCAPE} /> */}
+                <View
+                    style={{
+                        width: '100%',
+                        height: windowHeight - 50,
+                        backgroundColor: '#000000',
+                    }}
+                >
+                    <Video
+                        ref={videoRef}
+                        onLoad={(data) => onLoad({ data, player, setPlayer })}
+                        paused={player.paused}
+                        onProgress={(data) => onProgress({ data, player, setPlayer })}
+                        style={{ width: '100%', height: '100%' }}
+                        source={{
+                            uri: url,
+                        }}
+                    />
+                    <Controls player={player} setPlayer={setPlayer} videoRef={videoRef} />
+                </View>
+            </View>
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        position: 'relative',
-    },
-    video: {
-        aspectRatio: 16 / 9,
-    },
-});
-
 export default VideoPlayer;
